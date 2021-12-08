@@ -1,0 +1,19 @@
+{
+  "name": "obfuscator_lol",
+  "version": "1.0.0",
+  "description": "obfuscator.io deobfuscator",
+  "main": "deobfuscate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ceres-c",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^8.3.0",
+    "shift-codegen": "^7.0.3",
+    "shift-parser": "^7.0.3",
+    "shift-query": "^1.0.2",
+    "shift-reducer": "^6.0.0",
+    "shift-scope": "^5.0.0"
+  }
+}
