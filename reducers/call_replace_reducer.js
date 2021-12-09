@@ -42,20 +42,10 @@ class CallReplaceReducer extends LazyCloneReducer {
 			} else {
 				throw new Error(`Invalid number of parameters (${node.arguments.length}) for callee ${node.callee.name}`)
 			}
-			return super.reduceCallExpression(node, state)
 		} else {
 			return super.reduceCallExpression(node, state);
 		}
 	}
-
-	// reduceVariableDeclarator(node, state) {
-	// 	if (this.replaceReferences.includes(node.init)) {
-	// 		this.replaceReferences = this.replaceReferences.filter(e => e != node.init) // Remove current node from references array
-	// 		return new ListMonad({values: [node.binding]}).concat(super.reduceVariableDeclarator(node, state));
-	// 	} else {
-	// 		return super.reduceVariableDeclarator(node, state)
-	// 	}
-	// }
 }
 
 module.exports.CallReplaceReducer = CallReplaceReducer;

@@ -63,8 +63,8 @@ function filterOverwriteAssignment(scope, functionName) {
 	return scopeCopy;
 }
 
-module.exports.findDeclarationScope = function(scope, functionReference) {
-	return findDeclarationScope(scope, functionReference);
+module.exports.findDeclarationScope = function(scope, declarationReference) {
+	return findDeclarationScope(scope, declarationReference);
 }
 module.exports.filterOverwriteAssignment = function(scope, functionName) {
 	return filterOverwriteAssignment(scope, functionName);
