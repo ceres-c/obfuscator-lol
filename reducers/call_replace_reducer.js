@@ -2,7 +2,15 @@ const { LiteralStringExpression } = require('shift-ast');
 const { LazyCloneReducer } = require('shift-reducer');
 const { base64Decode, RC4Decrypt } = require('../transform/obfuscator_strings_decoder')
 
-// Returns a ListMonad object whose `value` field contains all the assignments to a given target variable
+/**
+ * Replaces the calls to a given list of references with the corresponding result. e.g.
+ *	`console[c(0x19e, '4kR$')](c(0x19f, 'BT!9') + 'd!');` becomes
+ *	`console['log']('Hello worl' + 'd!');`
+ *
+ * Args:
+ *	- replaceReferences: a list of reference to decode/decrypt function which must be replaced
+ *	- stringDecodingData: An object with the list of source encoded/encrypted strings and the access offset
+ */
 class CallReplaceReducer extends LazyCloneReducer {
 	constructor(replaceReferences, stringDecodingData) {
 		if (replaceReferences === undefined || replaceReferences.length === 0) {
@@ -12,8 +20,6 @@ class CallReplaceReducer extends LazyCloneReducer {
 		this.stringDecodingData = stringDecodingData;
 		this.replaceReferences = replaceReferences;
 	}
-
-	// TODO handle ArrayBinding objects such as `var [a, b] = [x, y]`
 
 	reduceCallExpression(node, state) {
 		if (this.replaceReferences.includes(node.callee)) {

@@ -35,8 +35,9 @@ let base64Function = analyzeStrArrDecodingFunc(tree);
 let base64FunctionDeclaration = base64Function.functionReference.name // Assuming FunctionDeclaration AST object
 let base64FunctionNameString = base64Function.functionReference.name.name // Assuming FunctionDeclaration AST object
 
-// Trovo lo scope che contiene tra le declaration una dichiarazione a base64Function.functionReference TODO translate
+// Find a scope containing, among the declaration, a declaration to base64FunctionNameString
 let functionScope = findDeclarationScope(globalScope, base64FunctionDeclaration);
+// Remove nested assignments (the base64Function reassign internally its own name to a new function)
 let functionScopeFilt = filterOverwriteAssignment(functionScope, base64FunctionNameString);
 
 let base64FunctionReferences = functionScopeFilt.variables.get(base64FunctionNameString).references.map(r => r.node); // Extract reference nodes
@@ -47,6 +48,8 @@ for (let d of functionRedeclarations) {
 	let variableScope = findDeclarationScope(globalScope, d);
 	indirectCalls.push(...variableScope.variables.get(d.name).references.filter(r => r.accessibility.isRead).map(r => r.node));
 	// Potentially, the above filter could be empty since declared variables are not always used
+
+	// TODO handle String Array Wrappers > 1.
 }
 tree = reduce(new CallReplaceReducer(indirectCalls, base64Function), tree);
 
