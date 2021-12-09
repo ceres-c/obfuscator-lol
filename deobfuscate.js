@@ -14,7 +14,7 @@ const { CallReplaceReducer } = require('./reducers/call-replace-reducer');
 const { analyzeStrArrDecodingFunc } = require('./parsers/stringarray-parser');
 const { findDeclarationScope, filterOverwriteAssignment } = require('./utils/scope-traversal');
 
-const { analyze: analyzeRotate } = require('./transforms/stringarrayrotate-transformers');
+const { analyze: analyzeRotate } = require('./transforms/stringarrayrotate-transformer');
 
 let enabledTransforms = {
 	// TODO detect these automatically
