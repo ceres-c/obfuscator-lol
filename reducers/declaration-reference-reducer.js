@@ -4,7 +4,9 @@ const { ListMonad } = require("./monads");
 // Returns a ListMonad object whose `value` field contains all the assignments to a given target variable
 class DeclarationReferenceReducer extends MonoidalReducer {
 	constructor(initReferences) {
-		if (initReferences === undefined || initReferences.length === 0) {
+		if (initReferences === undefined || !Array.isArray(initReferences)) {
+			throw new Error("initReferences must be an array")
+		} else if (initReferences.length === 0) {
 			throw new Error("The target list of references can't be empty")
 		}
 		super(ListMonad);

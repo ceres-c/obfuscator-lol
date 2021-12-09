@@ -1,6 +1,6 @@
 const { LiteralStringExpression } = require('shift-ast');
 const { LazyCloneReducer } = require('shift-reducer');
-const { base64Decode, RC4Decrypt } = require('../transform/obfuscator_strings_decoder')
+const { base64Decode, RC4Decrypt } = require('../transforms/strings-decoder')
 
 /**
  * Replaces the calls to a given list of references with the corresponding result. e.g.
