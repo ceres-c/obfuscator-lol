@@ -9,15 +9,13 @@ const { reduce } = require('shift-reducer');
 const scope = require('shift-scope');
 const { program } = require('commander');
 
-
-const { IdentifierReferenceFinder } = require('./tests/identifier-reference-finder');
 const { DeclarationReferenceReducer } = require('./reducers/declaration-reference-reducer');
 const { CallReplaceReducer } = require('./reducers/call-replace-reducer');
 const { analyzeStrArrDecodingFunc } = require('./parsers/stringarray-parser');
 const { findDeclarationScope, filterOverwriteAssignment } = require('./utils/scope-traversal');
 
 const { analyze: analyzeRotate } = require('./transforms/stringarrayrotate-transformer');
-const { findReferences } = require('./utils/references-finder');
+const { declarationUsages, findIndirectReferences } = require('./utils/references-finder');
 
 let enabledTransforms = {
 	// TODO detect these automatically
@@ -43,23 +41,31 @@ let globalScope = scope.default(tree); // TODO remove if actually unused
 
 // TODO implement an automatic pipelining system
 if (enabledTransforms.StringArrayTransformer) {
+	// TODO move code in here to separate analyzer file
 	console.log("[*] Searching Strings Array decoding function");
 	let decodingFunc = analyzeStrArrDecodingFunc(tree);
 
 	let decodingFuncDeclaration = decodingFunc.functionReference.name // Get an IdentifierExpression object
 	// Find all the references to the string decoding function, excluding all those withing the string decoding function itself
-	let decodingFuncReferences = findReferences(tree, decodingFuncDeclaration, {excludeSubtrees: [decodingFunc.functionReference]});
+	let decodingFuncReferences = declarationUsages(tree, decodingFuncDeclaration, {excludeSubtrees: [decodingFunc.functionReference]});
+	let indirectReferences = findIndirectReferences(tree, decodingFuncReferences);
+	tree = reduce(new CallReplaceReducer(indirectReferences, decodingFunc), tree);
 
-	let functionRedeclarations = reduce(new DeclarationReferenceReducer(decodingFuncReferences), tree).values;
-	let indirectCalls = [];
-	for (let d of functionRedeclarations) {
-		let variableScope = findDeclarationScope(globalScope, d);
-		indirectCalls.push(...variableScope.variables.get(d.name).references.filter(r => r.accessibility.isRead).map(r => r.node));
-		// Potentially, the above filter could be empty since declared variables are not always used
+	// if (enabledTransforms.StringArrayRotateFunctionTransformer) {
+	// 	tree = analyzeRotate(tree, globalScope, decodingFuncReferences);
+	// 	process.exit(123)
+	// }
 
-		// TODO handle String Array Wrappers > 1.
-	}
-	tree = reduce(new CallReplaceReducer(indirectCalls, decodingFunc), tree);
+	// let functionRedeclarations = reduce(new DeclarationReferenceReducer(decodingFuncReferences), tree).values;
+	// let indirectCalls = [];
+	// for (let d of functionRedeclarations) {
+	// 	let variableScope = findDeclarationScope(globalScope, d);
+	// 	indirectCalls.push(...variableScope.variables.get(d.name).references.filter(r => r.accessibility.isRead).map(r => r.node));
+	// 	// Potentially, the above filter could be empty since declared variables are not always used
+
+	// 	// TODO handle String Array Wrappers > 1.
+	// }
+	// tree = reduce(new CallReplaceReducer(indirectCalls, decodingFunc), tree);
 }
 
 console.log(codegen.default(tree));

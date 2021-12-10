@@ -74,6 +74,8 @@ function a() {
 }
 function hi() {
 	var c = b;
+	//var e = c;
 	console[c(0x19e, '4kR$')](c(0x19f, 'BT!9') + 'd!');
+	//console.log(e(0x19e, '4kR$'));
 }
 hi();

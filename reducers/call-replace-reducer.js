@@ -20,7 +20,7 @@ class CallReplaceReducer extends LazyCloneReducer {
 		}
 		super()
 		this.stringDecodingData = stringDecodingData;
-		this.replaceReferences = replaceReferences;
+		this.replaceReferences = replaceReferences.map(r => r.node); // Map out nodes for easier access
 	}
 
 	reduceCallExpression(node, state) {
