@@ -22,50 +22,10 @@ function findDeclarationScope(scope, declarationReference) {
 		return undefined;
 	}
 
-	let declarationName = declarationReference.name; // BindingIdentifier object
+	let declarationName = declarationReference.name; // declarationReference is a BindingIdentifier object, get the name as a string
 	return findDeclarationScopeCore(scope, declarationReference, declarationName);
-}
-
-/**
- * Filters out structures such as
- * 	function a() {
- * 		a = function() { // <= THIS reference will be ignored
- * 		}
- * 	}
- * 
- * Args:
- *	- scope: shift-scope scope object
- *	- functionName: function whose writes will be removed (string)
- * Returns:
- *	- Copy of the scope object without the writes
- * 
- * 	TODO this should be implemented passing the external function body and
- *  filtering out references to children nodes
- */
-function filterOverwriteAssignment(scope, functionName) {
-	let scopeCopy = {...scope};
-	scopeCopy.variables = new Map(scope.variables);
-
-	let variableObject = scopeCopy.variables.get(functionName);
-	if (variableObject === undefined) {
-		throw new Error(`Could not locate ${functionName} in current scope`);
-	}
-	let variableObjectCopy = {...variableObject};
-
-	let previousLength = variableObjectCopy.references.length;
-	variableObjectCopy.references = variableObjectCopy.references.filter(r => !r.accessibility.isWrite); // Filter out the only write access
-	if (previousLength - variableObjectCopy.references.length != 1) {
-		// When this program was coded in 2021, there was only one write, if this changes, this method is broken
-		throw new Error(`Deleted too many writes to ${functionName} in current scope`);
-	}
-
-	scopeCopy.variables.set(functionName, variableObjectCopy);
-	return scopeCopy;
 }
 
 module.exports.findDeclarationScope = function(scope, declarationReference) {
 	return findDeclarationScope(scope, declarationReference);
-}
-module.exports.filterOverwriteAssignment = function(scope, functionName) {
-	return filterOverwriteAssignment(scope, functionName);
 }

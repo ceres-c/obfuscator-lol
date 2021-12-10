@@ -13,7 +13,9 @@ const { base64Decode, RC4Decrypt } = require('../transforms/strings-decoder')
  */
 class CallReplaceReducer extends LazyCloneReducer {
 	constructor(replaceReferences, stringDecodingData) {
-		if (replaceReferences === undefined || replaceReferences.length === 0) {
+		if (replaceReferences === undefined || !Array.isArray(replaceReferences)) {
+			throw new Error("references must be an array")
+		} else if (replaceReferences.length === 0) {
 			throw new Error("The target list of references can't be empty")
 		}
 		super()

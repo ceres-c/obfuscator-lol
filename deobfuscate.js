@@ -9,12 +9,15 @@ const { reduce } = require('shift-reducer');
 const scope = require('shift-scope');
 const { program } = require('commander');
 
+
+const { IdentifierReferenceFinder } = require('./tests/identifier-reference-finder');
 const { DeclarationReferenceReducer } = require('./reducers/declaration-reference-reducer');
 const { CallReplaceReducer } = require('./reducers/call-replace-reducer');
 const { analyzeStrArrDecodingFunc } = require('./parsers/stringarray-parser');
 const { findDeclarationScope, filterOverwriteAssignment } = require('./utils/scope-traversal');
 
 const { analyze: analyzeRotate } = require('./transforms/stringarrayrotate-transformer');
+const { findReferences } = require('./utils/references-finder');
 
 let enabledTransforms = {
 	// TODO detect these automatically
@@ -36,29 +39,18 @@ console.log(`[*] Reading source file: ${options.source}`);
 const input_src = fs.readFileSync(options.source, "utf-8");
 
 let tree = parseScript(input_src);
-let globalScope = scope.default(tree);
+let globalScope = scope.default(tree); // TODO remove if actually unused
 
 // TODO implement an automatic pipelining system
 if (enabledTransforms.StringArrayTransformer) {
 	console.log("[*] Searching Strings Array decoding function");
-	let base64Function = analyzeStrArrDecodingFunc(tree);
-	let base64FunctionDeclaration = base64Function.functionReference.name // Assuming FunctionDeclaration AST object
-	let base64FunctionNameString = base64Function.functionReference.name.name // Assuming FunctionDeclaration AST object
+	let decodingFunc = analyzeStrArrDecodingFunc(tree);
 
-	// Find a scope containing, among the declaration, a declaration to base64FunctionNameString
-	let functionScope = findDeclarationScope(globalScope, base64FunctionDeclaration);
-	// Remove nested assignments (the base64Function reassign internally its own name to a new function)
-	let functionScopeFilt = filterOverwriteAssignment(functionScope, base64FunctionNameString);
+	let decodingFuncDeclaration = decodingFunc.functionReference.name // Get an IdentifierExpression object
+	// Find all the references to the string decoding function, excluding all those withing the string decoding function itself
+	let decodingFuncReferences = findReferences(tree, decodingFuncDeclaration, {excludeSubtrees: [decodingFunc.functionReference]});
 
-	let base64FunctionReferences = functionScopeFilt.variables.get(base64FunctionNameString).references.map(r => r.node); // Extract reference nodes
-
-	if (enabledTransforms.StringArrayRotateFunctionTransformer) {
-		tree = analyzeRotate(tree, globalScope, base64FunctionReferences);
-		process.exit(123)
-	}
-
-	let functionRedeclarations = reduce(new DeclarationReferenceReducer(base64FunctionReferences), tree).values;
-
+	let functionRedeclarations = reduce(new DeclarationReferenceReducer(decodingFuncReferences), tree).values;
 	let indirectCalls = [];
 	for (let d of functionRedeclarations) {
 		let variableScope = findDeclarationScope(globalScope, d);
@@ -67,7 +59,7 @@ if (enabledTransforms.StringArrayTransformer) {
 
 		// TODO handle String Array Wrappers > 1.
 	}
-	tree = reduce(new CallReplaceReducer(indirectCalls, base64Function), tree);
+	tree = reduce(new CallReplaceReducer(indirectCalls, decodingFunc), tree);
 }
 
 console.log(codegen.default(tree));
