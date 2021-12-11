@@ -20,21 +20,18 @@
  */
 
 const query = require('shift-query');
-const { reduce } = require('shift-reducer');
-const { DeclarationReferenceReducer } = require('../reducers/declaration-reference-reducer');
-const { findDeclarationScope } = require('../utils/scope-traversal');
+const { findRecursiveUsages } = require('../utils/references-finder');
 
 function check(tree) {
 	// ExpressionStatement > CallExpression > FunctionExpression > FunctionBody > WhileStatement[test.operand.operand.elements='']
 	throw new Error('StringArrayRotation check not implemented yet');
 }
 
-function parse(tree, globalScope, stringDecodingFuncReferences) {
+function parse(tree) {
 	let retObj = {
 		functionReference: undefined,
 		functionData: {
 			checkExpressionReference: undefined,
-			stringDecodingReferences: [],
 			finalValue: undefined,
 		}
 	}
@@ -77,18 +74,6 @@ function parse(tree, globalScope, stringDecodingFuncReferences) {
 		throw new Error(`Found wrong number of declarators in check expression init: ${variableExpressionQuery?.declaration?.declarators?.length}`);
 	}
 	retObj.functionData.checkExpressionReference = variableExpressionQuery?.declaration?.declarators[0].init;
-
-	// Find references to string decoding function calls
-	let functionRedeclarations = reduce(new DeclarationReferenceReducer(stringDecodingFuncReferences), retObj.functionReference).values;
-	let indirectCalls = [];
-	for (let d of functionRedeclarations) {
-		let variableScope = findDeclarationScope(globalScope, d);
-		indirectCalls.push(...variableScope.variables.get(d.name).references.filter(r => r.accessibility.isRead).map(r => r.node));
-		// Potentially, the above filter could be empty since declared variables are not always used
-
-		// TODO handle String Array Wrappers > 1.
-	}
-	retObj.functionData.stringDecodingReferences = indirectCalls;
 
 	retObj.functionData.finalValue = callQuery.arguments[1].value;
 

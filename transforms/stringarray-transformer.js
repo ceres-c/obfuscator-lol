@@ -5,12 +5,12 @@
 
 const { reduce } = require('shift-reducer');
 
-const { analyzeStrArrDecodingFunc } = require('../parsers/stringarray-parser');
+const { parse } = require('../parsers/stringarray-parser');
 const { findRecursiveUsages } = require('../utils/references-finder');
 const { CallReplaceReducer } = require('../reducers/call-replace-reducer');
 
 function analyze(tree) {
-	let decodingFunc = analyzeStrArrDecodingFunc(tree);
+	let decodingFunc = parse(tree);
 	let decodingFuncDeclaration = decodingFunc.functionReference.name // Get a BindingIdentifier object
 
 	// Find all the references to the string decoding function, excluding all those within the string decoding function itself

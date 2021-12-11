@@ -24,6 +24,9 @@ const { findDeclarationScope } = require('./scope-traversal');
 
 	// Find a scope containing, among all its declarations, a declaration to the target variable
 	let declScope = findDeclarationScope(globalScope, target);
+	if (declScope === undefined) {
+		throw new Error(`Could not find a suitable scope for variable ${target.name}`)
+	}
 	let references = declScope.variables.get(target.name).references;
 
 	if (subtrees.length > 0) {

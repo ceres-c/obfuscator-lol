@@ -149,19 +149,19 @@ function _getStrArr(globalAST, strArrFunctionName) {
 }
 
 // TODO doc
-function analyzeStrArrDecodingFunc(globalAST) {
+function parse(tree) {
 	let retObj = { // TODO document these
 		functionReference: undefined,
 		offset: undefined,
 		stringsArray: undefined,
 	}
 
-	let decodeFunc = _getStrArrDecodeFunc(globalAST);
+	let decodeFunc = _getStrArrDecodeFunc(tree);
 
 	retObj.functionReference = decodeFunc;
 
 	let stringsArrayFunctionName = _getStrArrFuncName(decodeFunc);
-	retObj.stringsArray = _getStrArr(globalAST, stringsArrayFunctionName).map(e => e['value']);
+	retObj.stringsArray = _getStrArr(tree, stringsArrayFunctionName).map(e => e['value']);
 
 	let subFuncAST = _getDecodeSubFunc(decodeFunc); // TODO move this function call to _getStrArrOffset or remove altogether (query subfunction directly)
 	retObj.offset = _getStrArrOffset(subFuncAST);
@@ -169,6 +169,6 @@ function analyzeStrArrDecodingFunc(globalAST) {
 	return retObj;
 }
 
-module.exports.analyzeStrArrDecodingFunc = function(globalAST) {
-	return analyzeStrArrDecodingFunc(globalAST);
+module.exports.parse = function(tree) {
+	return parse(tree);
 }

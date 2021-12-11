@@ -31,14 +31,13 @@ console.log(`[*] Reading source file: ${options.source}`);
 const input_src = fs.readFileSync(options.source, "utf-8");
 
 let tree = parseScript(input_src);
-let globalScope = scope.default(tree); // TODO remove if actually unused
 
 // TODO implement an automatic pipelining system
-// if (enabledTransforms.StringArrayRotateFunctionTransformer) {
-// 	console.log("[*] Unrotating Strings Array");
-// 	tree = analyzeStringArrayRotate(tree, globalScope, decodingFuncReferences);
-// 	process.exit(123)
-// }
+if (enabledTransforms.StringArrayRotateFunctionTransformer) {
+	console.log("[*] Unrotating Strings Array");
+	tree = analyzeStringArrayRotate(tree);
+	process.exit(123)
+}
 if (enabledTransforms.StringArrayTransformer) {
 	console.log("[*] Replacing Strings Array decoding function calls with result");
 	tree = analyzeStringArray(tree);
