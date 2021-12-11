@@ -36,7 +36,6 @@ let tree = parseScript(input_src);
 if (enabledTransforms.StringArrayRotateFunctionTransformer) {
 	console.log("[*] Unrotating Strings Array");
 	tree = analyzeStringArrayRotate(tree);
-	process.exit(123)
 }
 if (enabledTransforms.StringArrayTransformer) {
 	console.log("[*] Replacing Strings Array decoding function calls with result");

@@ -130,7 +130,8 @@ function _getStrArrFuncName(decodeAST) {
  * Args:
  *	- globalAST: the whole ast of the program
  *	- strArrFunctionName: The name of the function returning the strings array
- * Returns:
+ * Returns (in a list):
+ *	- The reference to the AST object
  *	- An array of strings
  */
 function _getStrArr(globalAST, strArrFunctionName) {
@@ -145,7 +146,7 @@ function _getStrArr(globalAST, strArrFunctionName) {
 	if (arrayExpr.elements === undefined) {
 		throw new Error('Could not find strings array elements');
 	}
-	return arrayExpr.elements;
+	return [arrayExpr, arrayExpr.elements.map(e => e['value'])];
 }
 
 // TODO doc
@@ -154,6 +155,7 @@ function parse(tree) {
 		functionReference: undefined,
 		offset: undefined,
 		stringsArray: undefined,
+		stringsArrayReference: undefined,
 	}
 
 	let decodeFunc = _getStrArrDecodeFunc(tree);
@@ -161,7 +163,7 @@ function parse(tree) {
 	retObj.functionReference = decodeFunc;
 
 	let stringsArrayFunctionName = _getStrArrFuncName(decodeFunc);
-	retObj.stringsArray = _getStrArr(tree, stringsArrayFunctionName).map(e => e['value']);
+	[retObj.stringsArrayReference, retObj.stringsArray] = _getStrArr(tree, stringsArrayFunctionName);
 
 	let subFuncAST = _getDecodeSubFunc(decodeFunc); // TODO move this function call to _getStrArrOffset or remove altogether (query subfunction directly)
 	retObj.offset = _getStrArrOffset(subFuncAST);

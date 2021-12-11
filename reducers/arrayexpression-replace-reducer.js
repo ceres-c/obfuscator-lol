@@ -2,13 +2,13 @@
 const { LazyCloneReducer } = require('shift-reducer');
 
 /**
- * Replaces calls to a given list of references with the return value of the replacer function
+ * Replaces a given list of ArrayExpression references with the return value of the replacer function
  *
  * Args:
- *	- replaceReferences: a list of reference to function calls which must be replaced
+ *	- replaceReferences: a list of ArrayExpression objects which must be replaced
  *	- replacer: A function that will be called for every node that has to be replaced, called with the node itself as an argument
  */
-class CallReplaceReducer extends LazyCloneReducer {
+class ArrayExpressionReplaceReducer extends LazyCloneReducer {
 	constructor(replaceReferences, replacer) {
 		if (replaceReferences === undefined || !Array.isArray(replaceReferences)) {
 			throw new Error("references must be an array")
@@ -16,18 +16,18 @@ class CallReplaceReducer extends LazyCloneReducer {
 			throw new Error("The target list of references can't be empty")
 		}
 		super()
-		this.replaceReferences = replaceReferences.map(r => r.node); // Map out nodes for easier access
+		this.replaceReferences = replaceReferences;
 		this.replacer = replacer;
 	}
 
-	reduceCallExpression(node, state) {
-		if (this.replaceReferences.includes(node.callee)) {
+	reduceArrayExpression(node, state) {
+		if (this.replaceReferences.includes(node)) {
 			// Found a call that can be replaced with the final result
 			return this.replacer(node, state);
 		} else {
-			return super.reduceCallExpression(node, state);
+			return super.reduceArrayExpression(node, state);
 		}
 	}
 }
 
-module.exports.CallReplaceReducer = CallReplaceReducer;
+module.exports.ArrayExpressionReplaceReducer = ArrayExpressionReplaceReducer;

@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+// TODO strings to avoid breaking source in both these functions
 
 /**
  * base64decode obfuscator.io base64 strings
@@ -14,7 +15,7 @@ function base64Decode(input, outString=true) {
 
 	let buffer = Buffer.from(swapCase(input), 'base64');
 	if (outString) {
-		return buffer.toString('utf-8');
+		return buffer.toString('utf-8').replace("'", "\\'");
 	} else {
 		return buffer;
 	}
@@ -35,7 +36,7 @@ function RC4Decrypt(ciphertext, key, outString=true) {
 	let decipher = crypto.createDecipheriv('rc4', key, '')
 	let decrypted = Buffer.concat([decipher.update(ciphertext, 'latin1'), decipher.final()]);
 	if (outString) {
-		return decrypted.toString('utf-8');
+		return decrypted.toString('utf-8').replace("'", "\\'");
 	} else {
 		return decrypted;
 	}
