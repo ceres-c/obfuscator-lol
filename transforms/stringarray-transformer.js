@@ -6,17 +6,17 @@
 const { reduce } = require('shift-reducer');
 
 const { analyzeStrArrDecodingFunc } = require('../parsers/stringarray-parser');
-const { declarationUsages, findIndirectReferences } = require('../utils/references-finder');
+const { findRecursiveUsages } = require('../utils/references-finder');
 const { CallReplaceReducer } = require('../reducers/call-replace-reducer');
 
 function analyze(tree) {
 	let decodingFunc = analyzeStrArrDecodingFunc(tree);
+	let decodingFuncDeclaration = decodingFunc.functionReference.name // Get a BindingIdentifier object
 
-	let decodingFuncDeclaration = decodingFunc.functionReference.name // Get an IdentifierExpression object
 	// Find all the references to the string decoding function, excluding all those within the string decoding function itself
-	let decodingFuncReferences = declarationUsages(tree, decodingFuncDeclaration, {excludeSubtrees: [decodingFunc.functionReference]});
-	let indirectReferences = findIndirectReferences(tree, decodingFuncReferences);
-	return reduce(new CallReplaceReducer(indirectReferences, decodingFunc), tree);
+	let decodingUsages = findRecursiveUsages(tree, decodingFuncDeclaration, {excludeSubtrees: [decodingFunc.functionReference]});
+
+	return reduce(new CallReplaceReducer(decodingUsages, decodingFunc), tree);
 }
 
 module.exports.analyze = function(tree) {

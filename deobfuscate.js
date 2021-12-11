@@ -9,7 +9,7 @@ const scope = require('shift-scope');
 const { program } = require('commander');
 
 const { analyze: analyzeStringArrayRotate } = require('./transforms/stringarrayrotate-transformer');
-const { analyze: analyzeStringArray } = require('./transforms/stringarray-transformer-NEW'); // TODO rename this file and remove old file
+const { analyze: analyzeStringArray } = require('./transforms/stringarray-transformer');
 
 let enabledTransforms = {
 	// TODO detect these automatically
