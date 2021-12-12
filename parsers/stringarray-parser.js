@@ -109,6 +109,7 @@ function _getStrArrOffset(decodeSubAST) {
 
 // TODO doc
 // Accepts function ast
+// Returns a string
 function _getStrArrFuncName(decodeAST) {
 	let arrayFunctionCallExpr = query(decodeAST, 'FunctionBody > VariableDeclarationStatement VariableDeclarator > CallExpression');
 	if (arrayFunctionCallExpr.length == 0) {
@@ -122,6 +123,24 @@ function _getStrArrFuncName(decodeAST) {
 		throw new Error('Could not find strings array function name');
 	}
 	return arrayFunctionCallExpr.callee.name;
+}
+
+/**
+ * Returns a reference to the function containing the strings array (the one being called to return the array itself)
+ * Args:
+ *	- tree: ast where the strings array function lies
+ *	- funcName: (string) the name of the strings array function
+ * Returns:
+ *	- A FunctionDeclaration object from the ast
+ */
+function _getStrArrFunc(tree, funcName) {
+	let arrayFunction = query(tree, `FunctionDeclaration[name.name="${funcName}"]:has(ArrayExpression)`);
+	if (arrayFunction.length == 0) {
+		throw new Error('Could not locate strings array function in tree');
+	} else if (arrayFunction.length > 1) {
+		throw new Error('Found too many potential strings array functions in tree');
+	}
+	return arrayFunction[0];
 }
 
 /**
@@ -149,13 +168,30 @@ function _getStrArr(globalAST, strArrFunctionName) {
 	return [arrayExpr, arrayExpr.elements.map(e => e['value'])];
 }
 
-// TODO doc
+/**
+ * Parses an ast to find information about the strings decoding function
+ * Args:
+ *	- tree: as ast containing the strings decoding function belongside other functions
+ * Returns:
+ *	- an object structured like this
+ *		functionReference: <A reference to the strings decoding function object in the ast - FunctionDeclaration object>,
+ *		functionData: {
+ *			offset: <The offset applied by the function to access the correct member in the strings array>,
+ *			stringsArray: <An array of plain strings, as found in the source>,
+ *			stringsArrayReference: <A reference to an ArrayExpression object, the array of LiteralStringExpression objects in the ast>,
+ *			stringsArrayFunctionReference: <A reference to the function containing and returning the strings array>
+ *		}
+ */
 function parse(tree) {
-	let retObj = { // TODO document these
+	let retObj = {
+		// TODO find reference to stringArray function
 		functionReference: undefined,
-		offset: undefined,
-		stringsArray: undefined,
-		stringsArrayReference: undefined,
+		functionData: {
+			offset: undefined,
+			stringsArray: undefined,
+			stringsArrayReference: undefined,
+			stringsArrayFunctionReference: undefined,
+		},
 	}
 
 	let decodeFunc = _getStrArrDecodeFunc(tree);
@@ -163,10 +199,12 @@ function parse(tree) {
 	retObj.functionReference = decodeFunc;
 
 	let stringsArrayFunctionName = _getStrArrFuncName(decodeFunc);
-	[retObj.stringsArrayReference, retObj.stringsArray] = _getStrArr(tree, stringsArrayFunctionName);
+	[retObj.functionData.stringsArrayReference, retObj.functionData.stringsArray] = _getStrArr(tree, stringsArrayFunctionName);
+
+	retObj.functionData.stringsArrayFunctionReference = _getStrArrFunc(tree, stringsArrayFunctionName);
 
 	let subFuncAST = _getDecodeSubFunc(decodeFunc); // TODO move this function call to _getStrArrOffset or remove altogether (query subfunction directly)
-	retObj.offset = _getStrArrOffset(subFuncAST);
+	retObj.functionData.offset = _getStrArrOffset(subFuncAST);
 
 	return retObj;
 }

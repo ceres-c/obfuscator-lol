@@ -26,9 +26,9 @@ function analyze(tree) {
 		// This function has the same interface of the original strings decoding function in the obfuscated JS
 		// and will be called by the below call to `eval`
 		if (arg2 === undefined) {
-			return base64Decode(parsedDecoding.stringsArray[arg1 + parsedDecoding.offset + offset]);
+			return base64Decode(parsedDecoding.functionData.stringsArray[arg1 + parsedDecoding.functionData.offset + offset]);
 		} else {
-			return RC4Decrypt(parsedDecoding.stringsArray[arg1 + parsedDecoding.offset + offset], arg2);
+			return RC4Decrypt(parsedDecoding.functionData.stringsArray[arg1 + parsedDecoding.functionData.offset + offset], arg2);
 		}
 	}
 	function stringArrayRotateReplacer(node, state) {
@@ -51,9 +51,7 @@ function analyze(tree) {
 
 	try {
 		(() => { // Emulating a python for-else
-			for (let i = 0; i < parsedDecoding.stringsArray.length; i++) {
-				// There are as many references in decodeReferencesInRotate as there are array access operations in the original code.
-				// Subtracting its length should avoid out of bound accesses
+			for (let i = 0; i < parsedDecoding.functionData.stringsArray.length; i++) {
 				let result = eval(newExpressionString)
 				if (result === parsedRotate.functionData.finalValue) {
 					return;
@@ -72,7 +70,7 @@ function analyze(tree) {
 		node.elements = [...node.elements.slice(offset), ...node.elements.slice(0,offset)];
 		return node;
 	}
-	tree = reduce(new ArrayExpressionReplaceReducer([parsedDecoding.stringsArrayReference], replacer), tree);
+	tree = reduce(new ArrayExpressionReplaceReducer([parsedDecoding.functionData.stringsArrayReference], replacer), tree);
 
 	// Remove string array rotation function
 	return reduce(new FunctionRemover([parsedRotate.functionReference]), tree);
