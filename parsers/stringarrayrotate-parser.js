@@ -35,20 +35,6 @@ function parse(tree) {
 		}
 	}
 
-	// TODO remove every parameter apart from tree and calculate locally globalScope and stringDecodingFuncReferences
-	/**
-	 * TODO
-	 * Passare a questa funzione solamente tree e stringDecodingFunctionReference,
-	 * cioè la singla reference alla definizione della funzione che decoda le stringhe.
-	 * Bisogna spostare le operazioni per ottenere stringDecodingFuncReferences in un helper da qualche parte.
-	 * Questo helper deve prendere in input:
-	 *	- un AST globale per calcolare lo scope
-	 *	- uno specifico elemento (il target da cercare)
-	 *	- un sub-AST, quello in cui serve cercare le reference
-	 * e restituire la lista delle reference indirette all'interno del sub-ast.
-	 * Possibilmente deve anche risolvere automaticamente le reference indirette multiple.
-	 */
-
 	function checkQueryResults(queryResult, queryName) {
 		if (queryResult.length == 0) {
 			throw new Error(`Could not locate ${queryName}`);

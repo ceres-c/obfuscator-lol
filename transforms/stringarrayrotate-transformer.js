@@ -12,6 +12,7 @@ const { CallReplaceReducer } = require('../reducers/call-replace-reducer');
 const { ArrayExpressionReplaceReducer } = require('../reducers/arrayexpression-replace-reducer');
 const { base64Decode, RC4Decrypt } = require('./strings-decoder');
 const parseIntCodegen = require('../reducers/parseInt-codegen');
+const { FunctionRemover } = require('../reducers/function-remover');
 
 function analyze(tree) {
 	let parsedDecoding = parseStringArray(tree); // Required to identify references to decoding function inside rotation function
@@ -71,9 +72,10 @@ function analyze(tree) {
 		node.elements = [...node.elements.slice(offset), ...node.elements.slice(0,offset)];
 		return node;
 	}
-	return reduce(new ArrayExpressionReplaceReducer([parsedDecoding.stringsArrayReference], replacer), tree);
+	tree = reduce(new ArrayExpressionReplaceReducer([parsedDecoding.stringsArrayReference], replacer), tree);
 
-	// TODO remove array rotation function
+	// Remove string array rotation function
+	return reduce(new FunctionRemover([parsedRotate.functionReference]), tree);
 }
 
 module.exports.analyze = function(tree) {
