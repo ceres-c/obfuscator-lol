@@ -11,6 +11,7 @@ const { findRecursiveUsages } = require('../utils/references-finder');
 const { CallReplaceReducer } = require('../reducers/call-replace-reducer');
 const { base64Decode, RC4Decrypt } = require('../transforms/strings-decoder');
 const { FunctionRemover } = require('../reducers/function-remover');
+const { VariableDeclarationRemover } = require('../reducers/variabledeclaration-remover');
 
 function analyze(tree) {
 	let parsedDecoding = parse(tree);
@@ -53,13 +54,13 @@ function analyze(tree) {
 
 	// Replace calls with actual value
 	let replacedTree = reduce(new CallReplaceReducer(decodingUsages, stringArrayReplacer), tree);
+	// Remove all the dangling assignations to temporary wrapper variables
+	let noVariablesTree = reduce(new VariableDeclarationRemover(decodingUsages), replacedTree);
 
 	// Remove strings array decoding function and strings array function itself
 	return reduce(new FunctionRemover([
 		parsedDecoding.functionReference, parsedDecoding.functionData.stringsArrayFunctionReference
-	]), replacedTree);
-
-	// TODO remove all variable assignments
+	]), noVariablesTree);
 }
 
 module.exports.analyze = function(tree) {
