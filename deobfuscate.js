@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-codegen = require('shift-codegen');
+const codegen = require('./utils/codegen');
 const { parseScript } = require('shift-parser');
 const scope = require('shift-scope');
 const { program } = require('commander');
@@ -19,6 +19,7 @@ let enabledTransforms = {
 
 program
 	.option('-d, --debug', 'enable debugging output (quite chatty)', false)
+	.option('-f, --format', 'output formatted code', false)
 	.requiredOption('-s, --source <source.js>', 'Obfuscated source file to read');
 program.parse(process.argv);
 const options = program.opts();
@@ -42,4 +43,4 @@ if (enabledTransforms.StringArrayTransformer) {
 	tree = analyzeStringArray(tree);
 }
 
-console.log(codegen.default(tree));
+console.log(codegen(tree, options.format));

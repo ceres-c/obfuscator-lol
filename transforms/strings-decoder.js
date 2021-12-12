@@ -1,5 +1,4 @@
 var crypto = require('crypto');
-// TODO strings to avoid breaking source in both these functions
 
 /**
  * base64decode obfuscator.io base64 strings
@@ -9,16 +8,19 @@ var crypto = require('crypto');
  * Return:
  * 	A string or Buffer object, depending on the value of outString
  */
-function base64Decode(input, outString=true) {
-	// Need to swap case since obfuscator.io code uses a a-zA-Z0-9+/= alphabet, while standard base64 uses A-Za-z0-9+/=
-	let swapCase = string => string.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('');
-
-	let buffer = Buffer.from(swapCase(input), 'base64');
-	if (outString) {
-		return buffer.toString('utf-8').replace("'", "\\'");
-	} else {
-		return buffer;
-	}
+function base64Decode(input) {
+    // Copied directly from code output by obfuscator.io since Buffer's base64 implementation is broken:
+    // spurious backslashes will be added to escape the string.
+    var alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';
+    var p = '';
+    var q = '';
+    for (var r = 0x0, s, t, u = 0x0; t = input.charAt(u++); ~t && (s = r % 0x4 ? s * 0x40 + t : t, r++ % 0x4) ? p += String.fromCharCode(0xff & s >> (-0x2 * r & 0x6)) : 0x0) {
+        t = alphabet.indexOf(t);
+    }
+    for (var v = 0x0, w = p.length; v < w; v++) {
+        q += '%' + ('00' + p.charCodeAt(v).toString(0x10)).slice(-0x2);
+    }
+    return decodeURIComponent(q);
 }
 
 /**
@@ -45,6 +47,6 @@ function RC4Decrypt(ciphertext, key, outString=true) {
 module.exports.base64Decode = function(input) {
 	return base64Decode(input);
 }
-module.exports.RC4Decrypt = function(ciphertext, key) {
-	return RC4Decrypt(ciphertext, key);
+module.exports.RC4Decrypt = function(ciphertext, key, outString=true) {
+	return RC4Decrypt(ciphertext, key, outString);
 }

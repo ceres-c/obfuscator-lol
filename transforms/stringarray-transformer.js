@@ -51,6 +51,8 @@ function analyze(tree) {
 	}
 
 	return reduce(new CallReplaceReducer(decodingUsages, stringArrayReplacer), tree);
+
+	// TODO remove array rotation function
 }
 
 module.exports.analyze = function(tree) {

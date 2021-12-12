@@ -73,7 +73,7 @@ function analyze(tree) {
 	}
 	return reduce(new ArrayExpressionReplaceReducer([parsedDecoding.stringsArrayReference], replacer), tree);
 
-	// TODO there is a bug with some elements around here
+	// TODO remove array rotation function
 }
 
 module.exports.analyze = function(tree) {

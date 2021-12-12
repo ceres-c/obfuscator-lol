@@ -20,7 +20,6 @@
  */
 
 const query = require('shift-query');
-const { findRecursiveUsages } = require('../utils/references-finder');
 
 function check(tree) {
 	// ExpressionStatement > CallExpression > FunctionExpression > FunctionBody > WhileStatement[test.operand.operand.elements='']
