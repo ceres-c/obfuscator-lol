@@ -51,8 +51,7 @@ const { findDeclarationScope } = require('./scope-traversal');
 }
 
 /**
- * Given a list of Reference objects, returns a list of BindingIdentifiers to whome any of these reference is assigned to. e.g.
- * 
+ * Given a list of Reference objects, returns a list of BindingIdentifiers to whom any of these reference is assigned to. e.g. (given in input: [<Reference to a>])
  *	let a = 1;
  *	console.log(a)	// <= not this
  *	let b = a;		// <= this

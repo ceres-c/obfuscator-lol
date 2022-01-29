@@ -5,7 +5,6 @@ const path = require('path');
 
 const codegen = require('./utils/codegen');
 const { parseScript } = require('shift-parser');
-const scope = require('shift-scope');
 const { program } = require('commander');
 
 const { analyze: analyzeStringArrayRotate } = require('./transforms/stringarrayrotate-transformer');

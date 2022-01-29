@@ -3,7 +3,7 @@
  */
 
 const { reduce } = require('shift-reducer');
-const { CallExpression, IdentifierExpression, VariableDeclarator, LiteralStringExpression, ArrayExpression } = require('shift-ast');
+const { CallExpression, IdentifierExpression } = require('shift-ast');
 
 const { parse: parseStringArrayRotate } = require('../parsers/stringarrayrotate-parser');
 const { parse: parseStringArray } = require('../parsers/stringarray-parser');
