@@ -7,8 +7,6 @@ const { LazyCloneReducer } = require('shift-reducer');
  *
  * Args:
  *	- deleteReferences: a list of reference to function declarations which must be deleted
- *
- * TODO: avoid emitting EmptyStatements at all
  */
 class FunctionRemover extends LazyCloneReducer {
 	constructor(deleteReferences) {

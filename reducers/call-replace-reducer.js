@@ -34,7 +34,6 @@ class CallReplaceReducer extends LazyCloneReducer {
  * Simple replacer function to delete calls
  */
 function emptyReplacer(node, state) {
-	// TODO: avoid emitting EmptyStatements at all
 	return new EmptyStatement();
 }
 
