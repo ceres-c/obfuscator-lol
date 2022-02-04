@@ -1,4 +1,4 @@
-
+const { EmptyStatement } = require('shift-ast');
 const { LazyCloneReducer } = require('shift-reducer');
 
 /**
@@ -30,4 +30,15 @@ class CallReplaceReducer extends LazyCloneReducer {
 	}
 }
 
+/**
+ * Simple replacer function to delete calls
+ */
+function emptyReplacer(node, state) {
+	// TODO: avoid emitting EmptyStatements at all
+	return new EmptyStatement();
+}
+
 module.exports.CallReplaceReducer = CallReplaceReducer;
+module.exports.emptyReplacer = function(node, state) {
+	return emptyReplacer(node, state);
+}

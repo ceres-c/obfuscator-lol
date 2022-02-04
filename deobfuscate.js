@@ -9,11 +9,13 @@ const { program } = require('commander');
 
 const { analyze: analyzeStringArrayRotate } = require('./transforms/stringarrayrotate-transformer');
 const { analyze: analyzeStringArray } = require('./transforms/stringarray-transformer');
+const { analyze: analyzeSelfDefend } = require('./transforms/selfdefend-transformer');
 
 let enabledTransforms = {
 	// TODO detect these automatically
-	StringArrayTransformer: true,
-    StringArrayRotateFunctionTransformer: true,
+	StringArrayTransformer: false,
+    StringArrayRotateFunctionTransformer: false,
+	SelfDefendTransformer: true,
 }
 
 program
@@ -40,6 +42,10 @@ if (enabledTransforms.StringArrayRotateFunctionTransformer) {
 if (enabledTransforms.StringArrayTransformer) {
 	console.log("[*] Replacing Strings Array decoding function calls with result");
 	tree = analyzeStringArray(tree);
+}
+if (enabledTransforms.SelfDefendTransformer) {
+	console.log("[*] Removing Self Defending Code protections");
+	tree = analyzeSelfDefend(tree);
 }
 
 console.log(codegen(tree, options.format));

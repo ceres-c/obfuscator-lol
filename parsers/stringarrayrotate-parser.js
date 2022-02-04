@@ -68,6 +68,6 @@ function parse(tree) {
 module.exports.check = function(tree) {
 	return check(tree);
 }
-module.exports.parse = function(tree, globalScope, stringDecodingFuncReferences) {
-	return parse(tree, globalScope, stringDecodingFuncReferences);
+module.exports.parse = function(tree) {
+	return parse(tree);
 }
