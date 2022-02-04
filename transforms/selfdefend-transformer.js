@@ -14,14 +14,14 @@ function analyze(tree) {
 
 	let searchFunctionCalls = declarationUsages(
 		tree,
-		parsedSelfDefending.searchFunctionDeclarator.binding,
-		{ excludeSubtrees: [parsedSelfDefending.searchFunctionDeclarator], }
+		parsedSelfDefending.selfDefFuncDeclarator.binding,
+		{ excludeSubtrees: [parsedSelfDefending.selfDefFuncDeclarator], }
 	)
 
 	let replacedTree = reduce(new FunctionRemover([ // Remove function declarations
-		parsedSelfDefending.applyFunctionDeclarator, parsedSelfDefending.searchFunctionDeclarator
+		parsedSelfDefending.callControllerFuncDeclarator, parsedSelfDefending.selfDefFuncDeclarator
 	]), tree);
-	debugger
+
 	return reduce(new CallReplaceReducer(searchFunctionCalls, emptyReplacer), replacedTree); // Remove calls to 'search' function
 }
 
